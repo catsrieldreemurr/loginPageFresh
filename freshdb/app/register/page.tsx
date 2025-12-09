@@ -3,12 +3,42 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/ui/navbar";
+import { Spinner } from "@/components/ui/spinner";
 import Typography from "@/components/ui/typography";
 import { useState } from "react";
 
 export default function Page(){
     const [name, setName] = useState('');
     const [rawPas, setRawPas] = useState('');
+    const [isloading, setIsLoading] = useState(false);
+    const [showWarning, setShowWarning] = useState(false);
+    const [warningMessage, setWarningMessage] = useState('')
+
+    async function handleSubmit(){
+        if(name.trim().length > 0 && rawPas.trim().length > 0){
+
+            try{
+            setIsLoading(true);
+                const res = await fetch('api/register', {
+                    method: "POST",
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({
+                        username: name,
+                        password: rawPas,
+                    })
+                })
+                const data = await res.json();
+                
+                if(!res.ok){
+                    setWarningMessage(data.message)
+                    setShowWarning(true);
+                }
+            } catch(err){
+                console.error(err);
+            }
+            setIsLoading(false);
+        }
+    }
 
     return <div className="bg-gray-900 h-screen">
         <Navbar></Navbar>
@@ -18,8 +48,13 @@ export default function Page(){
         <div className="flex justify-center">
             <form onSubmit={(e) => {
                     e.preventDefault();
-                    console.log(name, rawPas)
+                    handleSubmit();
+
                 }}>
+
+                {showWarning && <div className="bg-red-200 border border-red-600 p-5">
+                    <p className="text-lg text-red-600">{warningMessage}</p>    
+                </div>}
                 <FieldGroup className="w-[20rem] sm:w-[40rem] mt-10">
                     <Field>
                         <FieldLabel htmlFor="name" className="text-white">Name</FieldLabel>
@@ -35,7 +70,7 @@ export default function Page(){
                         }}></Input>
                     </Field>
 
-                    <Button className="bg-gray-200 text-black w-[5rem] hover:bg-gray-500" type="submit" >Submit</Button>
+                    <Button disabled={isloading} className="bg-gray-200 text-black w-[10rem] hover:bg-gray-500" type="submit" >{isloading && <Spinner></Spinner>} {isloading ? "Loading.." : "Submit"}</Button>
                 </FieldGroup>
             </form>
         </div>

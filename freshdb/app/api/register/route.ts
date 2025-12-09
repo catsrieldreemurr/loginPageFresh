@@ -1,5 +1,12 @@
-import { error } from 'console';
-import mysql from 'mysql2/promise'
+import { AArrowUp } from 'lucide-react';
+import mysql, { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
+const bcrypt = require("bcrypt");
+
+async function HashPass(raw:string){
+    return await bcrypt.hash(raw, 10).then(function(hash:string){
+        return hash
+    })
+}
 
 export async function POST(req:Request){
     const connection = await mysql.createConnection({
@@ -10,13 +17,32 @@ export async function POST(req:Request){
     });
 
     const data = await req.json();
-    const {username, passwordRaw} = data;
+    const {username, password} = data;
+
+    const hashedPassword = await HashPass(password);
 
     try{
-        const [results, fields] = await connection.query('DESCRIBE userInfo');
-        return new Response(JSON.stringify(results), {status: 200})
+        const [results]: [ResultSetHeader, any] = await connection.execute("INSERT IGNORE INTO userInfo (username, passwordHash) VALUES(?,?)", [username, hashedPassword])
+        await connection.end();
+
+        if(results.affectedRows === 0){
+            return new Response(JSON.stringify({
+                success: false,
+                message: "Username must be unique."
+            }), {status: 400})
+        }else{
+            return new Response(JSON.stringify({
+            success: true,
+            username: username,
+            message: "User created succcessfully"
+        }), {status: 200})
+        }
     } catch(err){
         console.error(err);
-        return new Response(JSON.stringify("something went wrong"), {status: 500})
+        await connection.end();
+        return new Response(JSON.stringify({
+            success: false,
+            message: "Something went wrong. Try again later."
+        }), {status: 500})
     }
 }
