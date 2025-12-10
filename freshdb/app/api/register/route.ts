@@ -1,4 +1,3 @@
-import { AArrowUp } from 'lucide-react';
 import mysql, { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 const bcrypt = require("bcrypt");
 
@@ -26,11 +25,13 @@ export async function POST(req:Request){
         await connection.end();
 
         if(results.affectedRows === 0){
+            await connection.end();
             return new Response(JSON.stringify({
                 success: false,
                 message: "Username must be unique."
             }), {status: 400})
         }else{
+            await connection.end();
             return new Response(JSON.stringify({
             success: true,
             username: username,

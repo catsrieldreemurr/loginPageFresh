@@ -49,7 +49,6 @@ export default function Page(){
             <form onSubmit={(e) => {
                     e.preventDefault();
                     handleSubmit();
-
                 }}>
 
                 {showWarning && <div className="bg-red-200 border border-red-600 p-5">

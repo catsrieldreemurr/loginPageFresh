@@ -7,7 +7,7 @@ export default function Navbar(){
         <div className="flex items-center gap-10">
             <Link href={"/"}>Main</Link>
             <Link href={"/register"}>Register</Link>
-            <Link href={"/"}>Log in</Link>
+            <Link href={"/login"}>Log in</Link>
         </div>
     </nav>
 }
