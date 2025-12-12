@@ -1,4 +1,5 @@
-import mysql, { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
+import mysql, { RowDataPacket } from 'mysql2/promise'
+import jwt from "jsonwebtoken";
 const bcrypt = require("bcrypt");
 
 export async function POST(req:Request){
@@ -40,12 +41,34 @@ export async function POST(req:Request){
             success: false,
             message: 'Invalid Username or Password'
         }), {status: 401})
-    } else{
-        await connection.end();
-        return new Response(JSON.stringify({
-            success: true, 
-            message: 'Login Successful'
-        }), {status: 200})
     }
+
+    const token = jwt.sign(
+        {username: user.username },
+        process.env.JWT_SECRET as string,
+        {expiresIn: "7d"}
+    );
+
+    await connection.end();
+
+const cookieOptions = [
+    `token=${token}`,
+    `HttpOnly`,
+    `Path=/`,
+    `Max-Age=${60*60*24*7}`,
+    `SameSite=Strict`,
+];
+
+if (process.env.NODE_ENV === 'production') cookieOptions.push('Secure');
+
+return new Response(
+    JSON.stringify({ success: true, message: "Login Successful" }),
+    {
+        status: 200,
+        headers: {
+            "Set-Cookie": cookieOptions.join('; ')
+        },
+    }
+);
 
 }
