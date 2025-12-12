@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import Navbar from "@/components/ui/navbar";
 import { Spinner } from "@/components/ui/spinner";
 import Typography from "@/components/ui/typography";
-import WarningMessage from "@/components/warningmessage";
+import WarningMessage from "@/components/ui/warningmessage";
 import { use, useState } from "react";
 
 export default function Page(){

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
-export function middleware(req: NextRequest){
+export function proxy(req: NextRequest){
     const token = req.cookies.get("token")?.value;
 
     if(!token){
@@ -12,16 +12,15 @@ export function middleware(req: NextRequest){
 
     try{
         jwt.verify(token, process.env.JWT_SECRET as string);
-        console.log("Token valid → allowing access");
         return NextResponse.next();
     } catch(err){
-        console.log("JWT verification failed:", err);
-        return NextResponse.redirect(new URL("/login", req.url));
+        return NextResponse.redirect(new URL("/exclusive", req.url));
     }
 }
 
 export const config = {
     matcher: [
-        "/exclusive/:path*"
+        "/exclusive/:path*",
+        "/login",
     ]
 }

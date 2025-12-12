@@ -22,16 +22,13 @@ export async function POST(req:Request){
 
     try{
         const [results]: [ResultSetHeader, any] = await connection.execute("INSERT IGNORE INTO userInfo (username, passwordHash) VALUES(?,?)", [username, hashedPassword])
-        await connection.end();
 
         if(results.affectedRows === 0){
-            await connection.end();
             return new Response(JSON.stringify({
                 success: false,
                 message: "Username must be unique."
             }), {status: 400})
         }else{
-            await connection.end();
             return new Response(JSON.stringify({
             success: true,
             username: username,
@@ -45,5 +42,8 @@ export async function POST(req:Request){
             success: false,
             message: "Something went wrong. Try again later."
         }), {status: 500})
+    }
+    finally{
+        await connection.end();
     }
 }
