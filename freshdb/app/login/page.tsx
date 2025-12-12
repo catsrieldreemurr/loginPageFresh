@@ -6,11 +6,14 @@ import Navbar from "@/components/ui/navbar";
 import { Spinner } from "@/components/ui/spinner";
 import Typography from "@/components/ui/typography";
 import WarningMessage from "@/components/ui/warningmessage";
-import { use, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Page(){
     const [showWarning, setShowWarning] = useState(false);
     const [warningMessage, setWarningMessage] = useState("");
+    
+    const router = useRouter()
 
     const [name, setName] = useState('');
     const [rawPassword, setRawPassword] = useState('');
@@ -41,6 +44,7 @@ export default function Page(){
                     setSuccessful(data.success);
                     setShowWarning(true);
                     setWarningMessage(data.message);
+                    router.push("/exclusive");
                 }
 
             } catch(err){

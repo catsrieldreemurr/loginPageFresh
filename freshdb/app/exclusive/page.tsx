@@ -14,7 +14,7 @@ export default async function Exclusive(){
         username = decoded.username;
     }
      return (<div className="bg-gray-900 h-screen">
-        <Navbar></Navbar>
+       <Navbar></Navbar>
 
         <div className="flex flex-col justify-center items-center h-screen bg-gray-900">
             <Typography variant="h1">Welcome, {username}</Typography>

@@ -4,18 +4,25 @@ import jwt from "jsonwebtoken";
 
 export function proxy(req: NextRequest){
     const token = req.cookies.get("token")?.value;
+    const url = req.nextUrl.pathname;
 
-    if(!token){
-        console.log("No token found → redirecting to /login");
+    let isValid = false;
+    if(token){
+        try{
+            jwt.verify(token, process.env.JWT_SECRET as string);
+            isValid = true;
+            } catch{}
+        }
+
+    if (url === "/login" && isValid){
+        return NextResponse.redirect(new URL("/exclusive", req.url));
+    }
+
+    if (url === "/exclusive" && !isValid){
         return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    try{
-        jwt.verify(token, process.env.JWT_SECRET as string);
-        return NextResponse.next();
-    } catch(err){
-        return NextResponse.redirect(new URL("/exclusive", req.url));
-    }
+    return NextResponse.next();
 }
 
 export const config = {
