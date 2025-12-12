@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import Navbar from "@/components/ui/navbar";
 import { Spinner } from "@/components/ui/spinner";
 import Typography from "@/components/ui/typography";
+import WarningMessage from "@/components/warningmessage";
 import { useState } from "react";
 
 export default function Page(){
@@ -13,6 +14,7 @@ export default function Page(){
     const [isloading, setIsLoading] = useState(false);
     const [showWarning, setShowWarning] = useState(false);
     const [warningMessage, setWarningMessage] = useState('')
+    const [wasSuccessful, setSuccessful] = useState(false);
 
     async function handleSubmit(){
         if(name.trim().length > 0 && rawPas.trim().length > 0){
@@ -32,6 +34,12 @@ export default function Page(){
                 if(!res.ok){
                     setWarningMessage(data.message)
                     setShowWarning(true);
+                    setSuccessful(false)
+                }
+                else{
+                    setSuccessful(data.success);
+                    setShowWarning(true);
+                    setWarningMessage(data.message);
                 }
             } catch(err){
                 console.error(err);
@@ -49,16 +57,16 @@ export default function Page(){
             <form onSubmit={(e) => {
                     e.preventDefault();
                     handleSubmit();
+                    setShowWarning(false);
                 }}>
 
-                {showWarning && <div className="bg-red-200 border border-red-600 p-5">
-                    <p className="text-lg text-red-600">{warningMessage}</p>    
-                </div>}
+                <WarningMessage warning={warningMessage} successState={wasSuccessful} isVisible={showWarning}></WarningMessage>
                 <FieldGroup className="w-[20rem] sm:w-[40rem] mt-10">
                     <Field>
                         <FieldLabel htmlFor="name" className="text-white">Name</FieldLabel>
                         <Input id="name" autoComplete="off" placeholder="Set Username" className="bg-white" onChange={(e) => {
                             setName(e.target.value)
+                            setShowWarning(false);
                         }}></Input>
                     </Field>
                     
@@ -66,6 +74,7 @@ export default function Page(){
                         <FieldLabel htmlFor="password" className="text-white">Password</FieldLabel>
                         <Input id="password" type="password" autoComplete="off" placeholder="Set a secure password!" className="bg-white" onChange={(e)=> {
                             setRawPas(e.target.value);
+                            setShowWarning(false);
                         }}></Input>
                     </Field>
 

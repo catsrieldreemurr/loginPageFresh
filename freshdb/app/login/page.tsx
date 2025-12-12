@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import Navbar from "@/components/ui/navbar";
 import { Spinner } from "@/components/ui/spinner";
 import Typography from "@/components/ui/typography";
+import WarningMessage from "@/components/warningmessage";
 import { use, useState } from "react";
 
 export default function Page(){
@@ -46,6 +47,10 @@ export default function Page(){
                 console.error(err);
             }
             setIsLoading(false);
+        } else{
+            setWarningMessage("Missing Fields.")
+            setShowWarning(true);
+            setSuccessful(false);
         }
     }
 
@@ -59,9 +64,7 @@ export default function Page(){
                     HandleSubmit()
                 }}>
 
-                {showWarning && <div className={`border p-5 ${wasSuccessful === false && "border-red-600 bg-red-200"} ${wasSuccessful === true && "border-green-600 bg-green-200"}`}>
-                    <p className={`text-lg p-5 ${wasSuccessful === false && "text-red-600"} ${wasSuccessful === false && "text-red-600"}`} >{warningMessage}</p>    
-                </div>}
+                <WarningMessage isVisible={showWarning} warning={warningMessage} successState={wasSuccessful}></WarningMessage>
                 <FieldGroup className="w-[20rem] sm:w-[40rem] mt-10">
                     <Field>
                         <FieldLabel htmlFor="name" className="text-white">Name</FieldLabel>
